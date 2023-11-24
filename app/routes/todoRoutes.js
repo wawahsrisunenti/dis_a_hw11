@@ -1,5 +1,5 @@
 const express = require("express");
-const db = require("./dbConfig"); // import configuration database
+const db = require("../config/dbconfig"); // import configuration database
 
 const router = express.Router();
 
