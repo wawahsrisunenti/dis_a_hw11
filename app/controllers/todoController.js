@@ -8,7 +8,10 @@ const getTodos = (req, res) => {
           "Failed to fetch the to-do data. Looks like the to-do list is playing hide and seek!",
       });
     }
-    res.status(200).json(todos);
+    res.status(200).json({
+      message: "Successfully snagged the to-do data!",
+      data: todos,
+    });
   });
 };
 
@@ -21,7 +24,10 @@ const addTodo = (req, res) => {
           "Failed to add a new task. Looks like even the to-do list is on strike!",
       });
     }
-    res.status(201).json(todo);
+    res.status(201).json({
+      message: "Hooray! A brand new task has been added to the to-do list!",
+      data: todo,
+    });
   });
 };
 
@@ -36,7 +42,10 @@ const updateTodo = (req, res) => {
           "Failed to update a task. It seems our to-do list hit a snag in the upgrade department",
       });
     }
-    res.status(200).json(todo);
+    res.status(200).json({
+      message: "Task updated successfully! Our to-do list just got a makeover.",
+      data: todo,
+    });
   });
 };
 
@@ -50,7 +59,10 @@ const deleteTodo = (req, res) => {
           "Failed to delete a task. Looks like our to-do list is feeling a bit clingy!",
       });
     }
-    res.status(204).send();
+    res.status(204).json({
+      message:
+        "Task successfully evicted! Our to-do list is shedding some weight!",
+    });
   });
 };
 
