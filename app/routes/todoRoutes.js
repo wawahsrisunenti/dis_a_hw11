@@ -1,16 +1,9 @@
 const express = require("express");
-const db = require("../config/dbconfig"); // import configuration database
+const todoController = require("../controllers/todoController");
 
 const router = express.Router();
 
-// Endpoint for get list todo
-router.get("/todos", (req, res) => {
-  db.query("SELECT * FROM todo", (error, results) => {
-    if (error) {
-      throw error;
-    }
-    res.status(200).json(results.rows);
-  });
-});
+// Route for get list to-do
+router.get("/todos", todoController.getTodos);
 
 module.exports = router;
