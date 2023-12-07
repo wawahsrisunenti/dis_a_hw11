@@ -1,5 +1,8 @@
 const request = require("supertest");
-const app = require("../app/controllers/todoController");
+const app = require("../index");
+// const appController = require('../app/controllers/todoController');
+// const appModel = require('../app/models/todoModel');
+
 describe("Todo Controller", () => {
   test("should get all todos", (done) => {
     request(app)
