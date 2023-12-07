@@ -74,4 +74,11 @@ describe("Todo Controller", () => {
         done(err);
       });
   });
+
+  afterAll((done) => {
+    // Close server Express
+    app.close(() => {
+      done();
+    });
+  });
 });
