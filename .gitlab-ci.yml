@@ -5,7 +5,7 @@ variables:
   IMAGE_TAG: latest
 
 services:
-- docker:dind
+  - docker:dind
 
 before_script:
   - docker login --username=$DH_USERNAME --password=$DH_PASSWORD
@@ -23,11 +23,11 @@ build:
       --build-arg PORT=sPORT
       --no-cache .
       - echo "Tagging image..."
-      - docker tad docker-app:latest $REPOSITORY_URL:latest
-      - echo "Pushing image..."
-      - docker push $REPOSITORY_URL:latest
-    only:
-      - master
+    - docker tad docker-app:latest $REPOSITORY_URL:latest
+    - echo "Pushing image..."
+    - docker push $REPOSITORY_URL:latest
+  only:
+    - master
 
 deploy:
   stage: deploy
