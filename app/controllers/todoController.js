@@ -1,76 +1,96 @@
-const request = require("supertest");
-const app = require("../app/controllers/todoController");
-describe("Todo Controller", () => {
-  test("should get all todos", (done) => {
-    request(app)
-      .get("/todos")
-      .expect(200)
-      .then((res) => {
-        expect(res.body).toHaveProperty(
-          "message",
-          "Successfully snagged the to-do data!"
-        );
-        expect(res.body).toHaveProperty("data");
-        done();
-      })
-      .catch((err) => {
-        done(err);
-      });
-  });
+const express = require("express");
+const db = require("../models/todoModel");
+const router = express.Router();
 
-  test("should add a new todo", (done) => {
-    const newTodo = {
-      title: "New Todo",
-    };
-    request(app)
-      .post("/todos")
-      .send(newTodo)
-      .expect(201)
-      .then((res) => {
-        expect(res.body).toHaveProperty(
-          "message",
-          "Hooray! A brand new task has been added to the to-do list!"
-        );
-        expect(res.body).toHaveProperty("data");
-        done();
-      })
-      .catch((err) => {
-        done(err);
+// Menampilkan semua todo
+router.get("/todos", (req, res) => {
+  db.getAllTodos((err, result) => {
+    if (err) {
+      return res.status(500).json({
+        message:
+          "Failed to fetch the to-do data. Looks like the to-do list is playing hide and seek!",
+        error: err,
       });
-  });
-
-  test("should update a todo", (done) => {
-    const updatedTodo = {
-      id: 1,
-      title: "Updated Todo",
-    };
-    request(app)
-      .put(`/todos/${updatedTodo.id}`)
-      .send(updatedTodo)
-      .expect(200)
-      .then((res) => {
-        expect(res.body).toHaveProperty(
-          "message",
-          "Task updated successfully! Our to-do list just got a makeover."
-        );
-        expect(res.body).toHaveProperty("data");
-        done();
-      })
-      .catch((err) => {
-        done(err);
-      });
-  });
-
-  test("should delete a todo", (done) => {
-    const todoId = 1;
-    request(app)
-      .delete(`/todos/${todoId}`)
-      .expect(204)
-      .then((res) => {
-        done();
-      })
-      .catch((err) => {
-        done(err);
-      });
+    }
+    res.status(200).json({
+      message: "Successfully snagged the to-do data!",
+      data: result,
+    });
   });
 });
+
+// add new to do
+router.post("/todos", (req, res) => {
+  const title = req.body.title;
+
+  if (!title) {
+    return res.status(400).json({
+      message: "Title tidak boleh sekosong hati anda",
+    });
+  }
+
+  db.addTodo(title, (err, result) => {
+    if (err) {
+      return res.status(500).json({
+        message:
+          "Failed to add a new task. Looks like even the to-do list is on strike!",
+        error: err,
+      });
+    }
+    res.status(201).json({
+      message: "Hooray! A brand new task has been added to the to-do list!",
+      data: result,
+    });
+  });
+});
+
+// updating todo
+router.put("/todos/:id", (req, res) => {
+  const id = req.params.id;
+  const title = req.body.title;
+
+  if (!title) {
+    return res.status(400).json({
+      message: "Title tidak boleh sekosong hati anda.",
+    });
+  }
+
+  db.updateTodo(id, title, (err, result) => {
+    if (err) {
+      return res.status(500).json({
+        message:
+          "Failed to update a task. It seems our to-do list hit a snag in the upgrade department",
+        error: err,
+      });
+    }
+    if (result) {
+      res.status(200).json({
+        message:
+          "Task updated successfully! Our to-do list just got a makeover.",
+        data: result,
+      });
+    } else {
+      res.status(404).json({
+        message: "Todo not found.",
+      });
+    }
+  });
+});
+
+// Menghapus todo
+router.delete("/todos/:id", (req, res) => {
+  const id = req.params.id;
+
+  db.deleteTodo(id, (err) => {
+    if (err) {
+      return res.status(500).json({
+        message:
+          "Failed to delete a task. Looks like our to-do list is feeling a bit clingy!",
+        error: err,
+      });
+    }
+    res.status(204).send();
+  });
+});
+
+module.exports = router;
