@@ -1,5 +1,7 @@
 const request = require("supertest");
 const app = require("../index");
+// const appController = require('../app/controllers/todoController');
+// const appModel = require('../app/models/todoModel');
 
 describe("Todo Controller", () => {
   test("should get all todos", (done) => {
@@ -42,7 +44,7 @@ describe("Todo Controller", () => {
 
   test("should update a todo", (done) => {
     const updatedTodo = {
-      id: 2, // add ID same with data todo will be update
+      id: 1,
       title: "Updated Todo",
     };
     request(app)
@@ -63,7 +65,7 @@ describe("Todo Controller", () => {
   });
 
   test("should delete a todo", (done) => {
-    const todoId = 4;
+    const todoId = 1;
     request(app)
       .delete(`/todos/${todoId}`)
       .expect(204)
@@ -73,12 +75,5 @@ describe("Todo Controller", () => {
       .catch((err) => {
         done(err);
       });
-  });
-
-  afterAll((done) => {
-    // close server
-    app.close(() => {
-      done();
-    });
   });
 });

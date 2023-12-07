@@ -1,81 +1,96 @@
-const todoModel = require("../models/todoModel");
+const express = require("express");
+const db = require("../models/todoModel");
+const router = express.Router();
 
-const getTodos = (req, res) => {
-  todoModel.getAllTodos((error, todos) => {
-    if (error) {
+// show all todo
+router.get("/todos", (req, res) => {
+  db.getAllTodos((err, result) => {
+    if (err) {
       return res.status(500).json({
-        error:
+        message:
           "Failed to fetch the to-do data. Looks like the to-do list is playing hide and seek!",
+        error: err,
       });
     }
     res.status(200).json({
-      message: "Successfully snagged the to-do data!",
-      data: todos,
+      message: "Data todo berhasil diambil.",
+      data: result,
     });
   });
-};
+});
 
-const addTodo = (req, res) => {
-  const { title } = req.body;
-  todoModel.addTodo(title, (error, todo) => {
-    if (error) {
+// add new todo
+router.post("/todos", (req, res) => {
+  const title = req.body.title;
+
+  if (!title) {
+    return res.status(400).json({
+      message: "Title tidak boleh sekosong hati anda.",
+    });
+  }
+
+  db.addTodo(title, (err, result) => {
+    if (err) {
       return res.status(500).json({
-        error:
+        message:
           "Failed to add a new task. Looks like even the to-do list is on strike!",
+        error: err,
       });
     }
     res.status(201).json({
       message: "Hooray! A brand new task has been added to the to-do list!",
-      data: todo,
+      data: result,
     });
   });
-};
+});
 
-const updateTodo = (req, res) => {
-  const { id } = req.params;
-  const { title } = req.body;
+// updating todo
+router.put("/todos/:id", (req, res) => {
+  const id = req.params.id;
+  const title = req.body.title;
 
-  if (!id) {
+  if (!title) {
     return res.status(400).json({
-      error: "ID tugas not valid",
+      message: "Title tidak boleh sekosong hati anda.",
     });
   }
 
-  todoModel.updateTodo(id, title, (error, todo) => {
-    if (error) {
+  db.updateTodo(id, title, (err, result) => {
+    if (err) {
       return res.status(500).json({
-        error:
+        message:
           "Failed to update a task. It seems our to-do list hit a snag in the upgrade department",
+        error: err,
       });
     }
-    // respons terbaru untuk mencakup 'message' dan 'data'
-    res.status(200).json({
-      message: "Task updated successfully! Our to-do list just got a makeover.",
-      data: todo,
-    });
+    if (result) {
+      res.status(200).json({
+        message:
+          "Task updated successfully! Our to-do list just got a makeover.",
+        data: result,
+      });
+    } else {
+      res.status(404).json({
+        message: "Todo not found",
+      });
+    }
   });
-};
+});
 
-const deleteTodo = (req, res) => {
-  const { id } = req.params;
+// deleting todo
+router.delete("/todos/:id", (req, res) => {
+  const id = req.params.id;
 
-  todoModel.deleteTodo(id, (error) => {
-    if (error) {
+  db.deleteTodo(id, (err) => {
+    if (err) {
       return res.status(500).json({
-        error:
+        message:
           "Failed to delete a task. Looks like our to-do list is feeling a bit clingy!",
+        error: err,
       });
     }
-    res.status(204).json({
-      message:
-        "Task successfully evicted! Our to-do list is shedding some weight!",
-    });
+    res.status(204).send();
   });
-};
+});
 
-module.exports = {
-  getTodos,
-  addTodo,
-  updateTodo,
-  deleteTodo,
-};
+module.exports = router;
